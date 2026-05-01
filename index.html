@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#06060b" />
+    <title>VIRTUAL FEVER</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      #startMenu {
+        display: grid;
+        grid-template-rows: 1fr auto;
+        align-items: start;
+        justify-items: center;
+        padding: 0;
+        background: transparent;
+        pointer-events: none;
+      }
+
+      .menu-hero {
+        pointer-events: none;
+        text-align: center;
+        padding: max(52px, env(safe-area-inset-top) + 36px) 24px 0;
+        width: 100%;
+      }
+
+      .menu-hero .game-title {
+        font-size: clamp(40px, 13vw, 80px);
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        line-height: 0.95;
+        color: #35f6ff;
+        text-shadow:
+          0 0 10px #35f6ff,
+          0 0 28px rgba(53,246,255,0.75),
+          0 0 65px rgba(53,246,255,0.4),
+          0 0 2px #fff;
+        animation: titlePulse 3.5s ease-in-out infinite;
+      }
+
+      .menu-hero .game-sub {
+        margin-top: 12px;
+        font-size: clamp(10px, 2.8vw, 13px);
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: rgba(243,244,255,0.45);
+      }
+
+      @keyframes titlePulse {
+        0%,100% { text-shadow: 0 0 10px #35f6ff, 0 0 28px rgba(53,246,255,0.75), 0 0 65px rgba(53,246,255,0.4), 0 0 2px #fff; }
+        50%      { text-shadow: 0 0 20px #35f6ff, 0 0 50px rgba(53,246,255,0.95), 0 0 100px rgba(53,246,255,0.55), 0 0 4px #fff; }
+      }
+
+      .menu-bottom {
+        pointer-events: all;
+        width: min(420px, 92vw);
+        padding: 0 0 max(28px, env(safe-area-inset-bottom) + 16px);
+      }
+
+      .menu-bottom .panel { padding: 20px; }
+
+      .menu-bottom .hint {
+        text-align: center;
+        margin-top: 12px;
+        font-size: 12px;
+        color: rgba(243,244,255,0.35);
+        letter-spacing: 0.05em;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <h1 style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">VIRTUAL FEVER</h1>
+
+      <canvas id="gameCanvas" aria-label="Juego VIRTUAL FEVER"></canvas>
+
+      <button id="btnMenuInGame"    class="btn btn--ghost btnMenuInGame"    type="button" aria-label="Volver al menú"  hidden>Menú</button>
+      <button id="btnRestartInGame" class="btn btn--ghost btnRestartInGame" type="button" aria-label="Reiniciar nivel" hidden>Reiniciar</button>
+
+      <section id="startMenu" class="overlay" aria-label="Menú principal">
+
+        <div class="menu-hero">
+          <div class="game-title">VIRTUAL<br>FEVER</div>
+          <div class="game-sub">Puzzle · Arcade · Cyberpunk</div>
+        </div>
+
+        <div class="menu-bottom">
+          <div class="panel">
+            <div class="actions" style="margin-top:0">
+              <button id="btnPlay"     class="btn btn--primary"   type="button">▶ Jugar</button>
+              <button id="btnSettings" class="btn btn--secondary" type="button"
+                      aria-expanded="false" aria-controls="settingsPanel">⚙ Config</button>
+            </div>
+
+            <div id="settingsPanel" class="settings" hidden>
+              <div class="settingRow">
+                <div>Música</div>
+                <label class="toggle">
+                  <span>On</span>
+                  <input id="optMusic" type="checkbox" checked />
+                </label>
+              </div>
+              <div class="settingRow">
+                <div>SFX</div>
+                <label class="toggle">
+                  <span>On</span>
+                  <input id="optSfx" type="checkbox" checked />
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="hint">Doble tap para disparar · Arrastrá para precisión · ⚡ Doble tap en vuelo = Glitch Dash</div>
+        </div>
+
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
