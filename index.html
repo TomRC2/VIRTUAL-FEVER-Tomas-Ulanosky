@@ -79,7 +79,6 @@
       <button id="btnRestartInGame" class="btn btn--ghost btnRestartInGame" type="button" aria-label="Reiniciar nivel" hidden>Reiniciar</button>
 
       <section id="startMenu" class="overlay" aria-label="Menú principal">
-
         <div class="menu-hero">
           <div class="game-title">VIRTUAL<br>FEVER</div>
           <div class="game-sub">Puzzle · Arcade · Cyberpunk</div>
@@ -96,27 +95,50 @@
             <div id="settingsPanel" class="settings" hidden>
               <div class="settingRow">
                 <div>Música</div>
-                <label class="toggle">
-                  <span>On</span>
-                  <input id="optMusic" type="checkbox" checked />
-                </label>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <input id="volMusic" type="range" min="0" max="1" step="0.05" value="0.45"
+                         style="width:80px;accent-color:#35f6ff" />
+                  <label class="toggle">
+                    <span>On</span>
+                    <input id="optMusic" type="checkbox" checked />
+                  </label>
+                </div>
               </div>
               <div class="settingRow">
                 <div>SFX</div>
-                <label class="toggle">
-                  <span>On</span>
-                  <input id="optSfx" type="checkbox" checked />
-                </label>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <input id="volSfx" type="range" min="0" max="1" step="0.05" value="0.8"
+                         style="width:80px;accent-color:#ff3af2" />
+                  <label class="toggle">
+                    <span>On</span>
+                    <input id="optSfx" type="checkbox" checked />
+                  </label>
+                </div>
               </div>
             </div>
           </div>
 
           <div class="hint">Doble tap para disparar · Arrastrá para precisión · ⚡ Doble tap en vuelo = Glitch Dash</div>
         </div>
-
       </section>
     </main>
 
-    <script src="./script.js"></script>
+    <!--
+      Orden de carga obligatorio:
+      1. state.js  — define G (estado global compartido)
+      2. audio.js  — SFX y música synthwave
+      3. bg.js     — fondo pre-renderizado
+      4. dash.js   — glitch dash
+      5. render.js — dibujo
+      6. input.js  — eventos
+      7. script.js — loop, estados, boot
+    -->
+    <script src="./js/state.js"></script>
+    <script src="./js/audio.js"></script>
+    <script src="./js/bg.js"></script>
+    <script src="./js/dash.js"></script>
+    <script src="./js/render.js"></script>
+    <script src="./js/input.js"></script>
+    <script src="./js/script.js"></script>
   </body>
 </html>
