@@ -70,6 +70,7 @@ const GAME = (() => {
       G.dash.used        = false;
       G.dash.available   = false;
       G.dash.fx          = [];
+      initParticles();
       spawnBucket();
       return;
     }
@@ -129,6 +130,44 @@ const GAME = (() => {
     AUDIO.shoot();
   }
 
+  // ─── Partículas ───────────────────────────────────────────────────────────
+  // Pool simple: máx 60 partículas activas, sin shadowBlur, sin new[] en caliente
+  const MAX_PARTICLES = 60;
+
+  function spawnParticles(x, y, count, color, speed, life) {
+    let spawned = 0;
+    for (let i = 0; i < G.particles.length && spawned < count; i++) {
+      if (G.particles[i].life <= 0) {
+        const a = Math.random() * Math.PI * 2;
+        const s = (0.4 + Math.random() * 0.6) * speed * G.runtime.dpr;
+        const p = G.particles[i];
+        p.x = x; p.y = y;
+        p.vx = Math.cos(a) * s; p.vy = Math.sin(a) * s;
+        p.life = life; p.maxLife = life;
+        p.r = (1 + Math.random() * 1.5) * G.runtime.dpr;
+        p.color = color;
+        spawned++;
+      }
+    }
+  }
+
+  function updateParticles(dt) {
+    for (const p of G.particles) {
+      if (p.life <= 0) continue;
+      p.x  += p.vx * dt;
+      p.y  += p.vy * dt;
+      p.vy += 400 * G.runtime.dpr * dt; // gravedad suave
+      p.life -= dt;
+    }
+  }
+
+  // Inicializar pool con partículas inactivas
+  function initParticles() {
+    G.particles = [];
+    for (let i = 0; i < MAX_PARTICLES; i++)
+      G.particles.push({ x:0, y:0, vx:0, vy:0, life:0, maxLife:1, r:1, color:"#fff" });
+  }
+
   // ─── Física / update ───────────────────────────────────────────────────────
   function updateAiming() {
     if (G.world.projectile) return;
@@ -156,6 +195,7 @@ const GAME = (() => {
     if (G.state !== "playing") return;
     updateAiming();
     updateBucket(dt);
+    updateParticles(dt);
     DASH.update(dt);
 
     const p = G.world.projectile; if (!p) return;
@@ -179,7 +219,13 @@ const GAME = (() => {
         if (!peg.hit) {
           peg.hit = true; peg.hitT = G.runtime.time;
           G.world.score += peg.kind === "target" ? 100 : 10;
-          peg.kind === "target" ? AUDIO.hitTarget() : AUDIO.bounce();
+          if (peg.kind === "target") {
+            AUDIO.hitTarget();
+            spawnParticles(peg.x, peg.y, 10, "#ffaa3c", 160, 0.55); // más, más rápidas
+          } else {
+            AUDIO.bounce();
+            spawnParticles(peg.x, peg.y, 4, "#35f6ff", 90, 0.35);   // pocas, sutiles
+          }
         }
       }
     }

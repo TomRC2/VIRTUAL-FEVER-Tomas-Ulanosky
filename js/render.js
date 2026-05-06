@@ -46,12 +46,58 @@ const RENDER = (() => {
     const dpr = runtime.dpr;
 
     ctx.save();
-    ctx.translate(x, y); ctx.rotate(angle);
-    ctx.strokeStyle = "#35f6ff"; ctx.lineWidth = 4 * dpr;
-    ctx.shadowBlur = 15; ctx.shadowColor = "#35f6ff";
-    ctx.strokeRect(0, -8 * dpr, 50 * dpr, 16 * dpr);
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+
+    // Cuerpo principal del cañón
+    const bL = 52 * dpr;   // largo del barril
+    const bH = 14 * dpr;   // alto del barril
+    const bY = -bH / 2;
+
+    // Relleno interior con gradiente
+    const grad = ctx.createLinearGradient(0, bY, 0, bY + bH);
+    grad.addColorStop(0,   "rgba(53,246,255,0.35)");
+    grad.addColorStop(0.5, "rgba(53,246,255,0.08)");
+    grad.addColorStop(1,   "rgba(53,246,255,0.35)");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.roundRect(0, bY, bL, bH, 3 * dpr);
+    ctx.fill();
+
+    // Borde neon cian
+    ctx.strokeStyle = "#35f6ff";
+    ctx.lineWidth   = 2 * dpr;
+    ctx.shadowBlur  = 18;
+    ctx.shadowColor = "#35f6ff";
+    ctx.beginPath();
+    ctx.roundRect(0, bY, bL, bH, 3 * dpr);
+    ctx.stroke();
+
+    // Boca del cañón (aro en la punta)
+    ctx.lineWidth  = 3 * dpr;
+    ctx.shadowBlur = 22;
+    ctx.beginPath();
+    ctx.roundRect(bL - 6 * dpr, bY - 3 * dpr, 8 * dpr, bH + 6 * dpr, 2 * dpr);
+    ctx.stroke();
+
+    // Base / pivote (círculo en el origen)
+    ctx.lineWidth  = 2 * dpr;
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.arc(0, 0, 9 * dpr, 0, Math.PI * 2);
     ctx.fillStyle = "rgba(53,246,255,0.2)";
-    ctx.fillRect(0, -8 * dpr, 50 * dpr, 16 * dpr);
+    ctx.fill();
+    ctx.stroke();
+
+    // Línea central decorativa
+    ctx.shadowBlur  = 6;
+    ctx.lineWidth   = 1 * dpr;
+    ctx.strokeStyle = "rgba(53,246,255,0.5)";
+    ctx.beginPath();
+    ctx.moveTo(10 * dpr, 0);
+    ctx.lineTo(bL - 8 * dpr, 0);
+    ctx.stroke();
+
     ctx.restore();
   }
 
@@ -73,21 +119,78 @@ const RENDER = (() => {
 
   function bucket() {
     const { ctx, runtime, world } = G;
-    if (!world.bucket) return;
+    const b = world.bucket; if (!b) return;
+    const dpr = runtime.dpr;
+    const { x, y, w, h } = b;
+
     ctx.save();
-    ctx.strokeStyle = "#ff3af2"; ctx.lineWidth = 2 * runtime.dpr;
-    ctx.shadowBlur = 10; ctx.shadowColor = "#ff3af2";
-    ctx.strokeRect(world.bucket.x, world.bucket.y, world.bucket.w, world.bucket.h);
+
+    // Relleno interior con gradiente magenta
+    const grad = ctx.createLinearGradient(x, y, x, y + h);
+    grad.addColorStop(0,   "rgba(255,58,242,0.25)");
+    grad.addColorStop(1,   "rgba(255,58,242,0.05)");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 4 * dpr);
+    ctx.fill();
+
+    // Borde neon magenta
+    ctx.strokeStyle = "#ff3af2";
+    ctx.lineWidth   = 2 * dpr;
+    ctx.shadowBlur  = 16;
+    ctx.shadowColor = "#ff3af2";
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 4 * dpr);
+    ctx.stroke();
+
+    // Línea superior más brillante (boca del balde)
+    ctx.lineWidth  = 3 * dpr;
+    ctx.shadowBlur = 22;
+    ctx.beginPath();
+    ctx.moveTo(x + 4 * dpr, y);
+    ctx.lineTo(x + w - 4 * dpr, y);
+    ctx.stroke();
+
+    // Dos patas en la base
+    ctx.lineWidth  = 2 * dpr;
+    ctx.shadowBlur = 8;
+    [[x + w * 0.2, x + w * 0.2], [x + w * 0.8, x + w * 0.8]].forEach(([lx]) => {
+      ctx.beginPath();
+      ctx.moveTo(lx, y + h);
+      ctx.lineTo(lx, y + h + 4 * dpr);
+      ctx.stroke();
+    });
+
     ctx.restore();
   }
 
   function projectile() {
     const { ctx, world } = G;
     const p = world.projectile; if (!p) return;
+
     ctx.save();
-    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.fillStyle = "#f3f4ff"; ctx.shadowBlur = 20; ctx.shadowColor = "#35f6ff";
+
+    // Halo exterior
+    const halo = ctx.createRadialGradient(p.x, p.y, p.r * 0.3, p.x, p.y, p.r * 1.8);
+    halo.addColorStop(0,   "rgba(53,246,255,0.18)");
+    halo.addColorStop(1,   "rgba(53,246,255,0)");
+    ctx.fillStyle = halo;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * 1.8, 0, Math.PI * 2);
     ctx.fill();
+
+    // Esfera principal
+    const grad = ctx.createRadialGradient(p.x - p.r * 0.3, p.y - p.r * 0.3, p.r * 0.1, p.x, p.y, p.r);
+    grad.addColorStop(0,   "#ffffff");
+    grad.addColorStop(0.4, "#a0f8ff");
+    grad.addColorStop(1,   "#35f6ff");
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle   = grad;
+    ctx.shadowBlur  = 24;
+    ctx.shadowColor = "#35f6ff";
+    ctx.fill();
+
     ctx.restore();
   }
 
@@ -122,11 +225,24 @@ const RENDER = (() => {
     ctx.restore();
   }
 
+  function particles() {
+    const { ctx } = G;
+    // Sin shadowBlur — dibuja rectángulos de 1px para máximo rendimiento
+    for (const p of G.particles) {
+      if (p.life <= 0) continue;
+      const alpha = p.life / p.maxLife;
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle   = p.color;
+      ctx.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
+    }
+    ctx.globalAlpha = 1;
+  }
+
   function frame() {
     BG.draw();
     if (G.state !== "playing") return;
     walls(); aimLine(); cannon(); pegs(); bucket();
-    projectile(); DASH.drawFx(); DASH.drawIndicator(); hud();
+    projectile(); particles(); DASH.drawFx(); DASH.drawIndicator(); hud();
   }
 
   return { frame };

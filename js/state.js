@@ -33,7 +33,8 @@ const G = (() => {
       gravity: 1400, restitution: 0.55, wallRestitution: 0.45,
     },
 
-    // Glitch Dash
+    // Partículas — pool fijo, se reusan para no generar garbage
+    particles: [],
     dash: {
       available: false, used: false, fx: [],
     },
